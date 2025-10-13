@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+
+import fileinput
+import graph_tools
+import graph_sampling
+from perlcompat import getopts
+
+def main():
+    opts = getopts('d:i:o:p:s:t:')
+    directed = opts.d if opts.d else False
+    p = float(opts.p) if opts.p else 0.1
+    seed = int(opts.s) if opts.s else None
+    if seed:
+        random.seed(seed)
+    in_fmt = opts.i if opts.i else 'dot'
+    out_fmt = opts.o if opts.o else 'dot'
+    G = graph_tools.Graph(directed=directed)
+    G.import_graph(in_fmt, list(fileinput.input()))
+
+    Gs: graph_tools.Graph = None
+    match opts.t:
+        case 'RN':
+            sampler = graph_sampling.RandomNodeSampler(G)
+            Gs = sampler.sample(p)
+        case 'RDN':
+            sampler = graph_sampling.RandomDegreeNodeSampler(G)
+            Gs = sampler.sample(p)
+        case 'BFS':
+            sampler = graph_sampling.BFSCrawler(G)
+            Gs = sampler.sample(p)
+        case 'DFS':
+            sampler = graph_sampling.DFSCrawler(G)
+            Gs = sampler.sample(p)
+        case 'RW':
+            sampler = graph_sampling.RWCrawler(G)
+            Gs = sampler.sample(p)
+        case 'RJ':
+            sampler = graph_sampling.RJCrawler(G)
+            Gs = sampler.sample(p)
+        case _:
+            raise ValueError(f"unsupported algorithm: {opts.t}")
+        
+    print(Gs.export_graph(out_fmt), end='')
+
+if __name__ == "__main__":
+    main()
