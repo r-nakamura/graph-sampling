@@ -113,12 +113,12 @@ class RWCrawler(Crawler):
             agent.advance()
 
 class RJCrawler(RWCrawler):
-    def sample_by_component(self, component: set[Any], c: float = 0.15):
+    def sample_by_component(self, component: set[Any]):
         s = random.choice(list(component))
         agent = randwalk.SRW(self.g, current=s)
         while not self.is_component_explored(component):
             if not agent.current in self._explored:
                 self._explored.append(agent.current)
-            if random.uniform(0, 1) <= c:
+            if random.uniform(0, 1) <= self.c:
                 agent.current = random.choice(list(component))
             agent.advance()            
