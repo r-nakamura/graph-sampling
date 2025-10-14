@@ -98,17 +98,21 @@ class DFSCrawler(Crawler):
                     q.append(w)
 
 class RWCrawler(Crawler):
-    def sample_by_component(self, component: set[Any], c: float = 0.15):
+    def __init__(self, g: graph_tools.Graph, c:float = .15):
+        super().__init__(g)
+        self.c = c
+
+    def sample_by_component(self, component: set[Any]):
         s = random.choice(list(component))
         agent = randwalk.SRW(self.g, current=s)
         while not self.is_component_explored(component):
             if not agent.current in self._explored:
                 self._explored.append(agent.current)
-            if random.uniform(0, 1) <= c:
+            if random.uniform(0, 1) <= self.c:
                 agent.current = s
             agent.advance()
 
-class RJCrawler(Crawler):
+class RJCrawler(RWCrawler):
     def sample_by_component(self, component: set[Any], c: float = 0.15):
         s = random.choice(list(component))
         agent = randwalk.SRW(self.g, current=s)
