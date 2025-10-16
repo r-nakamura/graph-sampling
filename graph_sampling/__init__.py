@@ -7,8 +7,27 @@ import randwalk
 
 from typing import Any
 
+def create_sampler(algorithm: str,
+                   g: graph_tools.Graph,
+                   **kwargs) -> 'Sampler':
+    match algorithm:
+        case 'RN':
+            return RandomNodeSampler(g, **kwargs)
+        case 'RDN':
+            return RandomDegreeNodeSampler(g, **kwargs)
+        case 'BFS':
+            return BFSCrawler(g, **kwargs)
+        case 'DFS':
+            return DFSCrawler(g, **kwargs)
+        case 'RW':
+            return RWCrawler(g, **kwargs)
+        case 'RJ':
+            return RJCrawler(g, **kwargs)
+        case _:
+            raise ValueError(f"unsupported sampling algorithm: {algorithm}")
+
 class Sampler():
-    def __init__(self, g: graph_tools.Graph):
+    def __init__(self, g: graph_tools.Graph, **kwargs):
         self.g = g
 
 class NodeSampler(Sampler):
